@@ -1,4 +1,4 @@
-#!/usr/bin/env ruby
+#!/opt/ree/bin/ruby
 pod=<<-POD
 
 =head1 NAME
@@ -55,7 +55,7 @@ FLOOR_TIME      = Time.at((Time.now.to_f / INTERVAL).floor * INTERVAL)
 
 TEMP_FOLDER     = '/tmp'
 TEMP_FILE       = "rla_#{FLOOR_TIME.to_i}.yml"
-REQUEST_LOG_ANALYZER = ENV['request_log_analyzer'] || '/usr/bin/request-log-analyzer'
+REQUEST_LOG_ANALYZER = ENV['request_log_analyzer'] || '/opt/ree/bin/request-log-analyzer'
 
 # Check if we can run this plugin on this system
 def autoconf
@@ -82,7 +82,7 @@ def config
 graph_category App
 graph_title Processed requests
 graph_vlabel requests / #{INTERVAL / 60} minutes
-graph_info The amount of requests processed by this application server - railsdoctors.com
+graph_info The amount of requests processed by this application server
  
 get.label get
 get.draw AREA

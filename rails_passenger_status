@@ -1,8 +1,8 @@
-#!/usr/bin/env ruby
+#!/opt/ree/bin/ruby
 pod=<<-POD
 
 =head1 NAME
-passenger_status - Munin plugin to monitor passenger application servers.
+rails_passenger_status - Munin plugin to monitor passenger application servers.
 Monitors the amount of sessions and running, active and maximum amount of passenger instances.
 
 =head1 APPLICABLE SYSTEMS
@@ -44,7 +44,7 @@ MIT
 POD
 
 # Globals
-PASSENGER_STATUS = ENV['passenger_status'] || '/usr/local/bin/passenger-status'
+PASSENGER_STATUS = ENV['passenger_status'] || '/opt/ree/bin/passenger-status'
 
 # Check if this plugin can run
 def autoconf
@@ -77,13 +77,14 @@ def config
 graph_category App
 graph_title Passenger status
 graph_vlabel count
-graph_args --base 1000 -l 0 --upperlimit #{upper_limit}
-graph_info The amount of active passengers on this application server - railsdoctors.com
+graph_args --base 1000 -l 0 --upper-limit #{upper_limit}
+graph_info The amount of active passengers on this application server
  
 sessions.label sessions
 max.label max processes
 running.label running processes
 active.label active processes
+global.label global queue
 CONFIG
   exit 0
 end
@@ -110,6 +111,9 @@ def run(debug = false)
   status =~ /active\s+=\s+(\d+)/
   puts "active.value #{$1}"
  
+  status =~ /global queue:\s+(\d+)/
+  puts "queue.value #{$1}"
+
   total_sessions = 0
   status.scan(/Sessions: (\d+)/).flatten.each { |count| total_sessions += count.to_i }
   puts "sessions.value #{total_sessions}"
