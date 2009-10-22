@@ -13,7 +13,7 @@ ln -s rails_requests  /etc/munin/plugins/.
 ln -s rails_view_render_time /etc/munin/plugins/.
 
 echo "" >> /etc/munin/plugin-conf.d/munin-node
-echo "[rails*]" /etc/munin/plugin-conf.d/munin-node
+echo "[rails*]" >> /etc/munin/plugin-conf.d/munin-node
 echo "env.log_file '/var/log/apache2/access.log'" >> /etc/munin/plugin-conf.d/munin-node
 echo "user root" >> /etc/munin/plugin-conf.d/munin-node
 echo "command /opt/ree/bin/ruby %c" >> /etc/munin/plugin-conf.d/munin-node
