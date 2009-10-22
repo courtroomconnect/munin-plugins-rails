@@ -17,7 +17,7 @@ This configuration section shows the defaults of the plugin:
   command /usr/local/bin/ruby %c
   
 Options
-  env.passenger_status '/path/to/passenger-memory-stats'
+  env.passenger_memory_stats '/path/to/passenger-memory-stats'
 
 ln -s /usr/share/munin/plugins/rails_passenger_memory /etc/munin/plugins/rails_passenger_memory
 
@@ -35,7 +35,8 @@ The plugin shows the passenger memory stats
 None known
 
 =head1 AUTHOR
-Bart ten Brinke - railsdoctors.com
+Matthew Schoolmaster
+(based on Bart ten Brinke - railsdoctors.com)
 (based on Daniel Manges - http://gist.github.com/20319)
 
 =head1 LICENSE
@@ -43,7 +44,8 @@ MIT
 
 POD
 
-PASSENGER_MEMORY_STATS = ENV['passenger_memory_stats'] || '/opt/ree/bin/passenger-status'
+# Globals
+PASSENGER_MEMORY_STATS = ENV['passenger_memory_stats'] || '/opt/ree/bin/passenger-memory-stats'
 
 # Check if this plugin can run
 def autoconf
@@ -55,9 +57,9 @@ def autoconf
     exit 1
   end
   
-  status = `#{PASSENGER_STATUS}`
+  status = `#{PASSENGER_MEMORY_STATS}`
   unless $?.success?
-    puts "no (error whene excuting #{PASSENGER_STATUS})"
+    puts "no (error whene excuting #{PASSENGER_MEMORY_STATS})"
     exit 1
   end
   
@@ -65,32 +67,45 @@ def autoconf
   exit 0
 end
 
+# Describe the graph config
+def config
+  status = `#{PASSENGER_MEMORY_STATS}`
+  
+  status =~ /Total\s+:\s+(\d+)/
 
-
-
-def output_config
-  puts <<-END
+  puts <<-CONFIG
 graph_category App
 graph_title Passenger memory stats
-graph_vlabel count
+graph_vlabel megabytes
+graph_info The amount of memory passenger uses
  
-memory.label memory
-END
+apache.label apache memory
+nginx.label nginix memory
+passenger.label passenger memory
+CONFIG
   exit 0
 end
  
-def output_values
-  status = `sudo /opt/ree/bin/passenger-memory-stats | tail -1`
+# Collect the data
+# <tt>debug</tt> Show debug information
+def run(debug = false)
+  status = `#{PASSENGER_MEMORY_STATS}`
   unless $?.success?
     $stderr.puts "failed executing passenger-memory-stats"
     exit 1
   end
-  status =~ /(\d+\.\d+)/
-  puts "memory.value #{$1}"
+  
+  type = ['apache','nginx','passenger']
+  status.scan(/Total private dirty RSS: (\d+.\d+)/).flatten.each_with_index { |value,index| puts "#{type[index]}.value #{value}" }
 end
- 
+
+# Main
 if ARGV[0] == "config"
-  output_config
+  config
+elsif ARGV[0] == "autoconf"
+  autoconf
+elsif ARGV[0] == "debug"
+  run(true)
 else
-  output_values
+  run
 end

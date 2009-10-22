@@ -84,7 +84,7 @@ sessions.label sessions
 max.label max processes
 running.label running processes
 active.label active processes
-global.label global queue
+queue.label global queue
 CONFIG
   exit 0
 end
@@ -118,7 +118,6 @@ def run(debug = false)
   status.scan(/Sessions: (\d+)/).flatten.each { |count| total_sessions += count.to_i }
   puts "sessions.value #{total_sessions}"
 end
- 
 
 # Main
 if ARGV[0] == "config"
