@@ -20,4 +20,9 @@ echo -n "Path to rails log file: "
 read -e RAILS_LOG
 echo "env.log_file $RAILS_LOG" >> /etc/munin/plugin-conf.d/munin-node
 
+echo "" >> /etc/munin/plugin-conf.d/munin-node
+echo "[memcached_*]" >> /etc/munin/plugin-conf.d/munin-node
+echo "user root" >> /etc/munin/plugin-conf.d/munin-node
+echo "timeout 60" >> /etc/munin/plugin-conf.d/munin-node
+
 /etc/init.d/munin-node restart
